@@ -1,0 +1,35 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+<h:head>
+  <link rel="stylesheet" type="text/css" media="screen" href="style.css"/>
+  <title>Like Hero To Zero</title>
+
+</h:head>
+<h:body>
+  <h1>Like Hero To Zero</h1>
+  <h2>Übersicht über den CO2-Ausstoß der Länder</h2>
+
+  <h:form>
+    <div class="card">
+      <p:dataTable var="row" value="#{datenAnzeige.data}">
+        <p:column field="nr" headerText="Nr" filterable="false"/>
+        <p:column field="land" headerText="Land"/>
+        <p:column field="ausstoss" headerText="Ausstoss" filterable="false"/>
+      </p:dataTable>
+    </div>
+  </h:form>
+
+  <!-- Login-Button anzeigen, wenn der Benutzer nicht eingeloggt ist -->
+  <h:form>
+    <p:commandButton id="button" value="Daten bearbeiten" action="/Wissenschaftleransicht.xhtml?faces-redirect=true" styleClass="ui-button-raised"/>
+  </h:form>
+
+
+
+
+  <p id="fussnote">Bitte beachten Sie: <br/> Diese Seite ist nur ein Entwurf!</p>
+</h:body>
+</html>

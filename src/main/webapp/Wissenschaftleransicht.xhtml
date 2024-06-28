@@ -1,0 +1,112 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+<h:head>
+  <link rel="stylesheet" type="text/css" media="screen" href="style.css"/>
+  <title>Like Hero To Zero</title>
+  <h:outputText value="#{loginController.checkLogin()}"/>
+</h:head>
+<h:body>
+  <h1>Like Hero To Zero</h1>
+  <h2>Bearbeitung der Daten</h2>
+  <h:form id="form">
+    <p:growl id="msgs" showDetail="true"/>
+    <div class="card">
+      <h5>Row Editing</h5>
+      <p:dataTable id="products1" var="daten" value="#{datenAnzeige.data}" editable="true"
+                   style="margin-bottom:20px">
+
+        <p:ajax event="rowEdit" listener="#{datenAnzeige.onRowEdit}" update=":form:msgs"/>
+        <p:ajax event="rowEditCancel" listener="#{datenAnzeige.onRowCancel}" update=":form:msgs"/>
+
+        <p:column headerText="NR" sortable="true" >
+
+              <h:outputText value="#{daten.nr}"/>
+
+        </p:column>
+
+        <p:column headerText="Land" sortable="true">
+          <p:cellEditor>
+            <f:facet name="output">
+              <h:outputText value="#{daten.land}"/>
+            </f:facet>
+            <f:facet name="input">
+              <p:inputText value="#{daten.land}" style="width:100%" label="Name"/>
+            </f:facet>
+          </p:cellEditor>
+        </p:column>
+
+        <p:column headerText="Ausstoß" sortable="true">
+          <p:cellEditor>
+            <f:facet name="output">
+              <h:outputText value="#{daten.ausstoss}"/>
+            </f:facet>
+            <f:facet name="input">
+              <p:inputText value="#{daten.ausstoss}" style="width:100%"/>
+            </f:facet>
+          </p:cellEditor>
+        </p:column>
+
+        <p:column style="width:6rem">
+          <p:rowEditor editTitle="Edit Row" cancelTitle="Cancel Edit" saveTitle="Save Row"/>
+        </p:column>
+      </p:dataTable>
+    </div>
+    <div class="grid mt-3">
+      <div class="col-12">
+        <p:commandButton value="Add new row" process="@this" update="products1"
+                         action="#{datenAnzeige.onAddNew()}" oncomplete="PF('products1').addRow();"/>
+      </div>
+    </div>
+
+
+
+</h:form>
+
+<h:form>
+    <!--ab hier ALT -->
+    <h:panelGrid columns="2">
+      <h:commandLink value="zurück" action="#{datenController.zurueck()}" rendered="#{datenController.index > 0}"/>
+      <h:outputText rendered="#{datenController.index ==0 }" value=" "/>
+      <h:commandLink value="vor" action="#{datenController.vor()}" rendered="#{datenController.index lt datenController.maxIndex}"/>
+      <h:outputText rendered="#{datenController.index == datenController.maxIndex}" value=" "/>
+
+      <h:outputLabel value="Nr:" for="nr" />
+      <h:outputText id="nr" value="#{datenController.daten.nr}"/>
+
+
+      <h:outputLabel value="Land:" for="land" />
+      <h:inputText id="land" value="#{datenController.daten.land}" size="40" required="true">
+        <p:ajax event="change" update="land, nr, ausstoss" />
+      </h:inputText>
+      <h:outputLabel/>
+      <h:message for="land"/>
+
+
+      <h:outputLabel value="CO2-Ausstoß:" for="ausstoss" />
+      <h:inputText id="ausstoss" value="#{datenController.daten.ausstoss}" size="40" required="true">
+        <p:ajax event="change" update="land, nr, ausstoss" />
+      </h:inputText>
+      <h:outputLabel/>
+      <h:message for="ausstoss"/>
+
+      <h:commandLink value="zurück" action="#{datenController.zurueck()}" rendered="#{datenController.index > 0}"/>
+      <h:outputText rendered="#{datenController.index ==0 }" value=" "/>
+      <h:commandLink value="vor" action="#{datenController.vor()}" rendered="#{datenController.index lt datenController.maxIndex}"/>
+      <h:outputText rendered="#{datenController.index == datenController.maxIndex}" value=" "/>
+
+      <h:commandButton value="Daten Löschen" action="#{datenController.removeDaten}"/>
+      <h:commandButton value="Tabellenansicht" action="/Nutzeransicht.xhtml?faces-redirect=true"/>
+      <h:commandButton value="Logout" action="#{loginController.logout}"/>
+
+    </h:panelGrid>
+  </h:form>
+
+
+
+
+  <p id="fussnote">Bitte beachten Sie: <br/> Diese Seite ist nur ein Entwurf!</p>
+</h:body>
+</html>
