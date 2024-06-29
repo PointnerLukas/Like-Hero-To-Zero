@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 
+import static jakarta.faces.application.FacesMessage.*;
+
 @Named ("datenAnzeige")
 @ApplicationScoped
 public class DatenAnzeige
@@ -30,17 +32,14 @@ public class DatenAnzeige
 
     private List<Daten> data = new ArrayList<>();
 
-    @Inject
-    DatenController datenController;
-
 
     public DatenAnzeige()
     {
-        data.add(new Daten(1, "Deutschland",
+        data.add(new Daten( "Deutschland",
                 "1"));
-        data.add(new Daten(2, "Österreich",
+        data.add(new Daten( "Österreich",
                 "2"));
-        data.add(new Daten(3, "Schweiz",
+        data.add(new Daten( "Schweiz",
                 "3"));
     }
 
@@ -63,8 +62,7 @@ public class DatenAnzeige
 
     public void onAddNew() {
         // Add one new product to the table:
-        Daten newData = new Daten(data.size()+1, "a", "b");
-        System.out.println(datenController.getMaxIndex());
+        Daten newData = new Daten("Neues Land", "Neuer Ausstoß");
         System.out.println("data.size()" + data.size());
         data.add(newData);
         System.out.println("newData:" + newData);
@@ -74,7 +72,12 @@ public class DatenAnzeige
         FacesContext.getCurrentInstance().addMessage(null, msg);
     }
 
-
+    public void removeDaten(Daten daten) {
+        System.out.println("removeDaten" + daten);
+        data.remove(daten);
+        FacesMessage msg = new FacesMessage("Daten gelöscht", String.valueOf(daten.getLand()));
+        FacesContext.getCurrentInstance().addMessage(null, msg);
+    }
 
     static String hashPassword(String name, String pass, String salt) {
         try {
@@ -94,28 +97,29 @@ public class DatenAnzeige
         System.out.println("passHash: " + passHash);
         System.out.println("currentUser: " + currentUser);
         currentUser.reset();
+        boolean loginSuccessful = false;
+
         for (String[] user : users) {
             System.out.println("user: " + user);
             System.out.println("username: " + user[0]);
             System.out.println("password: " + user[1]);
             System.out.println("salt: " + user[2]);
-            if (user[0].equals(name)) {
-                System.out.println("user[0]: " + user[0]);
-                System.out.println("user[1]: " + user[1]);
-                System.out.println("username: " + user[0]);
-                if (user[1].equals(passHash)) {
-                    System.out.println("passhash: " + passHash);
-                    System.out.println("user[0]: " + user[0]);
-                    System.out.println("user[1]: " + user[1]);
-                    if (user[2].equals("admin")) {
-                        System.out.println("admin true");
-                        currentUser.setAdmin(true);
-                        return;
-                    } else throw new RuntimeException("Benutzer " + name + " ist falsch angelegt.");
+
+            if (user[0].equals(name) && user[1].equals(passHash)) {
+                loginSuccessful = true;
+                if (user[2].equals("admin")) {
+                    currentUser.setAdmin(true);
                 }
+                break;
             }
         }
+
+        if (!loginSuccessful) {
+            FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Login fehlgeschlagen", "Benutzername oder Passwort ist falsch.");
+            FacesContext.getCurrentInstance().addMessage(null, message);
+        }
     }
+
 }
 
 

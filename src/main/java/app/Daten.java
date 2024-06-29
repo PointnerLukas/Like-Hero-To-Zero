@@ -2,7 +2,7 @@ package app;
 
 public class Daten
 {
-    private int nr;
+
 
     private String land;
 
@@ -10,9 +10,8 @@ public class Daten
 
 
 
-    public Daten(int nr, String land, String ausstoss)
+    public Daten(String land, String ausstoss)
     {
-        this.nr = nr;
         this.land = land;
         this.ausstoss = ausstoss;
 
@@ -21,8 +20,7 @@ public class Daten
     @Override
     public String toString() {
         return "Daten{" +
-                "nr= " + nr +
-                ", land='" + land + '\'' +
+                "land='" + land + '\'' +
                 ", ausstoss='" + ausstoss + '\'' +
                 '}';
     }
@@ -32,10 +30,7 @@ public class Daten
         return land;
     }
 
-    public int getNr()
-    {
-        return nr;
-    }
+
 
     public String getAusstoss()
     {
@@ -50,7 +45,7 @@ public class Daten
         this.ausstoss = ausstoss;
     }
 
-    public void setNr(int nr) {this.nr = nr;}
+
 
 
 }

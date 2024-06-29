@@ -13,23 +13,35 @@
   <h2>Übersicht über den CO2-Ausstoß der Länder</h2>
 
   <h:form>
+
+    <p:toolbar id="stick" style="display: flex; justify-content: space-between; align-items: center; margin: 2px; top: 70px !important;">
+      <f:facet name="left">
+        <p:commandButton id="button" value="Daten bearbeiten" action="/Wissenschaftleransicht.xhtml?faces-redirect=true" styleClass="ui-button-raised"/>
+      </f:facet>
+      <f:facet name="right">
+        <h:panelGroup rendered="#{loginController.loggedIn}">
+          <p:commandButton value="Abmelden" action="#{loginController.logout}"/>
+        </h:panelGroup>
+      </f:facet>
+    </p:toolbar>
+    <p:sticky target="stick"/>
+
+
+  </h:form>
+
+  <h:form>
     <div class="card">
-      <p:dataTable var="row" value="#{datenAnzeige.data}">
-        <p:column field="nr" headerText="Nr" filterable="false"/>
+      <p:dataTable var="row" value="#{datenAnzeige.data}" paginator="true" rows="10">
         <p:column field="land" headerText="Land"/>
         <p:column field="ausstoss" headerText="Ausstoss" filterable="false"/>
       </p:dataTable>
     </div>
   </h:form>
 
-  <!-- Login-Button anzeigen, wenn der Benutzer nicht eingeloggt ist -->
-  <h:form>
-    <p:commandButton id="button" value="Daten bearbeiten" action="/Wissenschaftleransicht.xhtml?faces-redirect=true" styleClass="ui-button-raised"/>
-  </h:form>
 
 
 
 
-  <p id="fussnote">Bitte beachten Sie: <br/> Diese Seite ist nur ein Entwurf!</p>
+
 </h:body>
 </html>

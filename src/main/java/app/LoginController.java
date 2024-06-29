@@ -1,5 +1,6 @@
 package app;
 
+import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.faces.application.FacesMessage;
 import jakarta.faces.application.NavigationHandler;
 import jakarta.faces.component.UIComponent;
@@ -14,7 +15,7 @@ import jakarta.inject.Named;
 import java.io.Serializable;
 
 @Named ("loginController")
-@ViewScoped
+@ApplicationScoped
 public class LoginController implements Serializable {
 
     @Inject
@@ -62,9 +63,6 @@ public class LoginController implements Serializable {
     // this method should be called early to avoid providing information if the user is not logged in
     public void checkLogin() {
         if(!currentUser.isValid()) {
-            System.out.println("Current User is not valid! checkLogin()");
-            System.out.println("CurrentUser.isAdmin"+currentUser.isAdmin());
-            System.out.println("CurrentUser.isValid"+currentUser.isValid());
             failureMessage = "Bitte loggen Sie sich ein.";
             FacesContext fc = FacesContext.getCurrentInstance();
             NavigationHandler nh = fc.getApplication().getNavigationHandler();
@@ -73,35 +71,39 @@ public class LoginController implements Serializable {
 
     }
 
+    public boolean isLoggedIn() {
+        return currentUser != null && currentUser.isAdmin();
+    }
+
     public String logout() {
         currentUser.reset();
         return "Nutzeransicht.xhtml?faces-redirect=true";
     }
 
     public void postValidateUser(ComponentSystemEvent ev) {
+        System.out.println("postValidateUser Username:" + currentUser);
         UIInput temp = (UIInput) ev.getComponent();
         this.tempUsername = (String) temp.getValue();
     }
 
     public void validateLogin(FacesContext context, UIComponent component, Object value) throws ValidatorException {
+        String Password = (String) value;
         System.out.println("validateLogin reached");
-        String password = (String) value;
-        System.out.println("validateLogin Ergebniss: " + password +", " + ", " + currentUser + ", " + tempUsername + ", " + salt);
-        datenAnzeige.validateUsernameAndPassword(currentUser, tempUsername, password, salt);
-        if (!currentUser.isValid())
-            throw new ValidatorException(new FacesMessage("Login falsch!"));
+        System.out.println("tempUsername: " + tempUsername);
+        System.out.println("password: " + Password); // Use enteredPassword instead of this.password
+
+        datenAnzeige.validateUsernameAndPassword(currentUser, tempUsername, Password, salt);
     }
 
     public String login() {
-        System.out.println("login erreicht!!!");
+        System.out.println("login");
+        System.out.println("tempUsername: " + tempUsername);
+        System.out.println("password: " + password);
+        System.out.println(currentUser.isAdmin());
         if (currentUser.isAdmin()) {
             this.failureMessage = "";
-            System.out.println("Login: Wissenschaftleransicht");
             return "Wissenschaftleransicht.xhtml?faces-redirect=true";
         } else {
-            System.out.println("Login: Passwort Bentutzer nicht bekannt");
-            System.out.println("CurrentUser.isAdmin"+currentUser.isAdmin());
-            System.out.println("CurrentUser.isValid"+currentUser.isValid());
             this.failureMessage = "Passwort und Benutzername nicht erkannt.";
             return "";
         }
