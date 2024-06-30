@@ -4,53 +4,157 @@ import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.faces.application.FacesMessage;
 import jakarta.faces.context.FacesContext;
-import jakarta.inject.Inject;
 import jakarta.inject.Named;
-import org.primefaces.event.CellEditEvent;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.Persistence;
+import jakarta.persistence.TypedQuery;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.primefaces.event.RowEditEvent;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import static jakarta.faces.application.FacesMessage.*;
-
-@Named ("datenAnzeige")
+@Named("datenAnzeige")
 @ApplicationScoped
-public class DatenAnzeige
+public class DatenAnzeige {
 
-{
-    private final String[][] users =
-            new String[][]{
-                    // password hash obtained with java LoginController koch i-am-the-boss
-                    new String[]{"koch",
-                            "+INdDt2JaxoJLHzD4iAlWPYMJA0uJhusP37DvMHBKmen15EMj1Vn7BAxWS1TYFniKFKjuSyIEFbxy9jSx4d8Tw==",
-                            "admin"},
-            };
+    private final String[][] users = new String[][]{
+            // password hash obtained with java LoginController koch i-am-the-boss
+            new String[]{"koch",
+                    "+INdDt2JaxoJLHzD4iAlWPYMJA0uJhusP37DvMHBKmen15EMj1Vn7BAxWS1TYFniKFKjuSyIEFbxy9jSx4d8Tw==",
+                    "admin"},
+    };
 
     private List<Daten> data = new ArrayList<>();
 
+    private static final Logger LOGGER = Logger.getLogger(DatenAnzeige.class.getName());
 
-    public DatenAnzeige()
-    {
-        data.add(new Daten( "Deutschland",
-                "1"));
-        data.add(new Daten( "Österreich",
-                "2"));
-        data.add(new Daten( "Schweiz",
-                "3"));
+    static final List<Daten> baseCountries = new ArrayList<>();
+
+    private EntityManagerFactory emf;
+    private EntityManager entityManager;
+
+    @PostConstruct
+    public void init() {
+        try {
+            emf = Persistence.createEntityManagerFactory("LikeHeroToZero");
+            entityManager = emf.createEntityManager();
+
+            long count = (long) entityManager.createQuery("SELECT count(a) FROM Daten a").getSingleResult();
+            LOGGER.log(Level.INFO, "Anzahl der Datensätze in der Datenbank: " + count);
+
+            if (count == 0) {
+                File excelFile = new File("/Users/Lukas/IdeaProjects/Like-Hero-To-Zero/src/main/resources/Co2Daten.xlsx");
+                importDataFromExcel(excelFile);
+                entityManager.getTransaction().begin();
+                try {
+                    for (Daten data : baseCountries) {
+                        entityManager.persist(data);
+                    }
+                    entityManager.getTransaction().commit();
+                    LOGGER.log(Level.INFO, "Basisländer erfolgreich eingefügt");
+                } catch (Exception e) {
+                    if (entityManager.getTransaction().isActive()) {
+                        entityManager.getTransaction().rollback();
+                    }
+                    LOGGER.log(Level.SEVERE, "Fehler beim Einfügen der Basisländer", e);
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Fehler bei der Initialisierung von DatenAnzeige", e);
+        }
     }
 
-    public List<Daten> getData()
-    {
-        return data;
+    // Methode zum Importieren von Daten aus einer Excel-Datei
+
+    public void importDataFromExcel(File excelFile) {
+        try {
+            FileInputStream fileInputStream = new FileInputStream(excelFile);
+            Workbook workbook = new XSSFWorkbook(fileInputStream);
+
+            Sheet sheet = workbook.getSheetAt(0); // Annahme: Daten sind im ersten Blatt
+
+            for (Row currentRow : sheet) {
+                Cell landCell = currentRow.getCell(0);
+                Cell ausstossCell = currentRow.getCell(1);
+
+                String land = getStringValue(landCell);
+                String ausstoss = getFormattedNumericValue(ausstossCell);
+
+                Daten newData = new Daten(land, ausstoss);
+                baseCountries.add(newData);
+            }
+
+            fileInputStream.close();
+            LOGGER.log(Level.INFO, "Daten erfolgreich aus Excel importiert.");
+        } catch (Exception e) {
+            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Fehler beim Importieren von Daten aus Excel: " + e.getMessage(), e);
+        }
+    }
+
+    private String getStringValue(Cell cell) {
+        if (cell == null) {
+            return null;
+        }
+        switch (cell.getCellType()) {
+            case STRING:
+                return cell.getStringCellValue();
+            case NUMERIC:
+                return String.valueOf(cell.getNumericCellValue());
+            default:
+                throw new IllegalStateException("Unsupported cell type");
+        }
+    }
+
+    private String getFormattedNumericValue(Cell cell) {
+        if (cell == null) {
+            return null;
+        }
+        if (cell.getCellType() == CellType.NUMERIC) {
+            double value = cell.getNumericCellValue();
+            // Format the numeric value to three decimal places
+            DecimalFormat decimalFormat = new DecimalFormat("#.###");
+            return decimalFormat.format(value);
+        } else {
+            throw new IllegalStateException("Cell is not of type NUMERIC");
+        }
+    }
+
+    // Getter für data
+    public List<Daten> getData() {
+        TypedQuery<Daten> query = entityManager.createQuery("SELECT a FROM Daten a", Daten.class);
+        List<Daten> resultList = query.getResultList();
+        System.out.println("entityManager.createQuery: " + resultList);
+        return resultList;
     }
 
     public void onRowEdit(RowEditEvent<Daten> event) {
+        Daten editedData = event.getObject();
         System.out.println("onRowEdit erreicht");
         System.out.println(data.toString());
+
+        entityManager.getTransaction().begin();
+        try {
+            entityManager.merge(editedData);
+            entityManager.getTransaction().commit();
+        } catch (Exception e) {
+            if (entityManager.getTransaction().isActive()) {
+                entityManager.getTransaction().rollback();
+            }
+            e.printStackTrace();
+        }
+
         FacesMessage msg = new FacesMessage("Land wurde bearbeitet", String.valueOf(event.getObject().getLand()));
         FacesContext.getCurrentInstance().addMessage(null, msg);
     }
@@ -61,10 +165,21 @@ public class DatenAnzeige
     }
 
     public void onAddNew() {
-        // Add one new product to the table:
         Daten newData = new Daten("Neues Land", "Neuer Ausstoß");
         System.out.println("data.size()" + data.size());
-        data.add(newData);
+
+        entityManager.getTransaction().begin();
+        try {
+            entityManager.persist(newData);
+            entityManager.getTransaction().commit();
+            data.add(newData);
+        } catch (Exception e) {
+            if (entityManager.getTransaction().isActive()) {
+                entityManager.getTransaction().rollback();
+            }
+            e.printStackTrace();
+        }
+
         System.out.println("newData:" + newData);
         System.out.println("data: " + data.toString());
 
@@ -74,7 +189,22 @@ public class DatenAnzeige
 
     public void removeDaten(Daten daten) {
         System.out.println("removeDaten" + daten);
-        data.remove(daten);
+
+        entityManager.getTransaction().begin();
+        try {
+            Daten managedDaten = entityManager.find(Daten.class, daten.getId());
+            if (managedDaten != null) {
+                entityManager.remove(managedDaten);
+                data.remove(daten);
+                entityManager.getTransaction().commit();
+            }
+        } catch (Exception e) {
+            if (entityManager.getTransaction().isActive()) {
+                entityManager.getTransaction().rollback();
+            }
+            e.printStackTrace();
+        }
+
         FacesMessage msg = new FacesMessage("Daten gelöscht", String.valueOf(daten.getLand()));
         FacesContext.getCurrentInstance().addMessage(null, msg);
     }
@@ -82,8 +212,7 @@ public class DatenAnzeige
     static String hashPassword(String name, String pass, String salt) {
         try {
             MessageDigest digester = MessageDigest.getInstance("SHA-512");
-            byte[] hashBytes = digester.digest((name + pass + salt)
-                    .getBytes(StandardCharsets.UTF_8));
+            byte[] hashBytes = digester.digest((name + pass + salt).getBytes(StandardCharsets.UTF_8));
             return new String(Base64.getEncoder().encode(hashBytes));
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -119,41 +248,4 @@ public class DatenAnzeige
             FacesContext.getCurrentInstance().addMessage(null, message);
         }
     }
-
 }
-
-
-
-/*
-
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Named;
-
-import java.util.ArrayList;
-import java.util.List;
-
-@Named
-@ApplicationScoped
-public class DatenAnzeige
-{
-    private static List<Daten> data = new ArrayList<Daten>();
-
-    /**
-     * Creates a new instance of Shop
-
-    public DatenAnzeige()
-    {
-        data.add(new Daten(1, "Deutschland",
-                "123"));
-        data.add(new Daten(2, "Österreich",
-                "23"));
-        data.add(new Daten(3, "Schweiz",
-                "45"));
-    }
-
-    public static List<Daten> getData()
-    {
-        return data;
-    }
-}
-*/

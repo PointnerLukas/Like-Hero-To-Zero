@@ -7,7 +7,7 @@
 
     <persistence-unit name="LikeHeroToZero" transaction-type="RESOURCE_LOCAL">
 
-        <provider>org.hibernate.ejb.HibernatePersistence</provider>
+
         <exclude-unlisted-classes>false</exclude-unlisted-classes>
         <properties>
             <!-- Database connection settings -->

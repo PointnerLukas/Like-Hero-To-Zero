@@ -32,8 +32,8 @@
   <h:form>
     <div class="card">
       <p:dataTable var="row" value="#{datenAnzeige.data}" paginator="true" rows="10">
-        <p:column field="land" headerText="Land"/>
-        <p:column field="ausstoss" headerText="Ausstoss" filterable="false"/>
+        <p:column field="land" headerText="Land" sortable="false"/>
+        <p:column field="ausstoss" headerText="Ausstoss" filterable="false" sortable="false"/>
       </p:dataTable>
     </div>
   </h:form>
