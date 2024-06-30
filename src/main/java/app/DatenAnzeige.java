@@ -51,7 +51,7 @@ public class DatenAnzeige {
             entityManager = emf.createEntityManager();
 
             long count = (long) entityManager.createQuery("SELECT count(a) FROM Daten a").getSingleResult();
-            LOGGER.log(Level.INFO, "Anzahl der Datensätze in der Datenbank: " + count);
+            LOGGER.log(Level.INFO, "Datensätze Anzahl: " + count);
 
             if (count == 0) {
                 File excelFile = new File("/Users/Lukas/IdeaProjects/Like-Hero-To-Zero/src/main/resources/Co2Daten.xlsx");
@@ -71,18 +71,15 @@ public class DatenAnzeige {
                 }
             }
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Fehler bei der Initialisierung von DatenAnzeige", e);
+            LOGGER.log(Level.SEVERE, "Fehler bei Initialisierung von DatenAnzeige", e);
         }
     }
-
-    // Methode zum Importieren von Daten aus einer Excel-Datei
 
     public void importDataFromExcel(File excelFile) {
         try {
             FileInputStream fileInputStream = new FileInputStream(excelFile);
             Workbook workbook = new XSSFWorkbook(fileInputStream);
-
-            Sheet sheet = workbook.getSheetAt(0); // Annahme: Daten sind im ersten Blatt
+            Sheet sheet = workbook.getSheetAt(0);
 
             for (Row currentRow : sheet) {
                 Cell landCell = currentRow.getCell(0);
@@ -94,11 +91,9 @@ public class DatenAnzeige {
                 Daten newData = new Daten(land, ausstoss);
                 baseCountries.add(newData);
             }
-
             fileInputStream.close();
             LOGGER.log(Level.INFO, "Daten erfolgreich aus Excel importiert.");
         } catch (Exception e) {
-            e.printStackTrace();
             LOGGER.log(Level.SEVERE, "Fehler beim Importieren von Daten aus Excel: " + e.getMessage(), e);
         }
     }
@@ -131,11 +126,9 @@ public class DatenAnzeige {
         }
     }
 
-    // Getter für data
     public List<Daten> getData() {
         TypedQuery<Daten> query = entityManager.createQuery("SELECT a FROM Daten a", Daten.class);
         List<Daten> resultList = query.getResultList();
-        System.out.println("entityManager.createQuery: " + resultList);
         return resultList;
     }
 
@@ -152,9 +145,7 @@ public class DatenAnzeige {
             if (entityManager.getTransaction().isActive()) {
                 entityManager.getTransaction().rollback();
             }
-            e.printStackTrace();
         }
-
         FacesMessage msg = new FacesMessage("Land wurde bearbeitet", String.valueOf(event.getObject().getLand()));
         FacesContext.getCurrentInstance().addMessage(null, msg);
     }
@@ -166,7 +157,6 @@ public class DatenAnzeige {
 
     public void onAddNew() {
         Daten newData = new Daten("Neues Land", "Neuer Ausstoß");
-        System.out.println("data.size()" + data.size());
 
         entityManager.getTransaction().begin();
         try {
@@ -177,19 +167,12 @@ public class DatenAnzeige {
             if (entityManager.getTransaction().isActive()) {
                 entityManager.getTransaction().rollback();
             }
-            e.printStackTrace();
         }
-
-        System.out.println("newData:" + newData);
-        System.out.println("data: " + data.toString());
-
         FacesMessage msg = new FacesMessage("New Product added", String.valueOf(newData.getLand()));
         FacesContext.getCurrentInstance().addMessage(null, msg);
     }
 
     public void removeDaten(Daten daten) {
-        System.out.println("removeDaten" + daten);
-
         entityManager.getTransaction().begin();
         try {
             Daten managedDaten = entityManager.find(Daten.class, daten.getId());
@@ -202,9 +185,7 @@ public class DatenAnzeige {
             if (entityManager.getTransaction().isActive()) {
                 entityManager.getTransaction().rollback();
             }
-            e.printStackTrace();
         }
-
         FacesMessage msg = new FacesMessage("Daten gelöscht", String.valueOf(daten.getLand()));
         FacesContext.getCurrentInstance().addMessage(null, msg);
     }
@@ -220,20 +201,11 @@ public class DatenAnzeige {
     }
 
     void validateUsernameAndPassword(CurrentUser currentUser, String name, String pass, String salt) {
-        System.out.println("validateUsernameAndPassword reached");
-        System.out.println("name: " + name + ", pass: " + pass + ", salt: " + salt);
         String passHash = hashPassword(name, pass, salt);
-        System.out.println("passHash: " + passHash);
-        System.out.println("currentUser: " + currentUser);
         currentUser.reset();
         boolean loginSuccessful = false;
 
         for (String[] user : users) {
-            System.out.println("user: " + user);
-            System.out.println("username: " + user[0]);
-            System.out.println("password: " + user[1]);
-            System.out.println("salt: " + user[2]);
-
             if (user[0].equals(name) && user[1].equals(passHash)) {
                 loginSuccessful = true;
                 if (user[2].equals("admin")) {

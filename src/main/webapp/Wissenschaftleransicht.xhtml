@@ -20,7 +20,7 @@
         <p:commandButton value="Nutzeransicht" action="/Nutzeransicht.xhtml?faces-redirect=true" style="margin: 2"/>
       </f:facet>
       <f:facet name="right">
-      <p:commandButton value="Abmelden" action="#{loginController.logout}"/>
+        <p:commandButton value="Abmelden" action="#{loginController.logout}"/>
       </f:facet>
     </p:toolbar>
     <p:sticky target="stick"/>
@@ -33,8 +33,6 @@
         <p:ajax event="rowEdit" listener="#{datenAnzeige.onRowEdit}" update="form:msgs"/>
         <p:ajax event="rowEditCancel" listener="#{datenAnzeige.onRowCancel}" update="form:msgs"/>
 
-
-
         <p:column headerText="Land" field="land" sortable="false" filterBy="#{daten.land}" filterMatchMode="contains">
           <p:cellEditor>
             <f:facet name="output">
@@ -46,7 +44,7 @@
           </p:cellEditor>
         </p:column>
 
-        <p:column headerText="Ausstoß" field="ausstoss" sortable="true" filterable="false">
+        <p:column headerText="GHG Ausstoß (in mtCO2eq/year)" field="ausstoss" sortable="false" filterable="false">
           <p:cellEditor>
             <f:facet name="output">
               <h:outputText value="#{daten.ausstoss}"/>
@@ -65,10 +63,6 @@
         </p:column>
       </p:dataTable>
     </div>
-
-
-
-
 
   </h:form>
 

@@ -5,7 +5,7 @@
       xmlns:f="http://xmlns.jcp.org/jsf/core">
 <h:head>
     <link rel="stylesheet" type="text/css" media="screen" href="style.css"/>
-    <title>Zander Filz Shop: Login</title>
+    <title>Like Hero To Zero: Login</title>
 </h:head>
 <h:body>
 
@@ -14,19 +14,18 @@
 
         <p:growl id="message" showDetail="true"/>
         <p:spacer/>
+
         <h3><p:outputLabel value="Benutzername" /></h3>
 
         <p:inputText id="user" value="#{loginController.user}" size="40" required="true">
             <f:event type="postValidate" listener="#{loginController.postValidateUser}"/>
         </p:inputText>
-        <h:message for="user" styleClass="error"/>
+            <h:message for="user" styleClass="error"/>
 
         <p:spacer/>
         <h3><p:outputLabel value="Passwort" /></h3>
         <p:password id="password" value="#{loginController.password}" toggleMask="true" required="true" validator="#{loginController.validateLogin}"/>
             <h:message for="password" styleClass="error"/>
-
-
 
         <p class="error"><h:outputText value="#{loginController.failureMessage}"/></p>
         <div class="card">
@@ -35,6 +34,5 @@
         </div>
 
     </h:form>
-
 </h:body>
 </html>

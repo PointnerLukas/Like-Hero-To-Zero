@@ -9,11 +9,11 @@
 
 </h:head>
 <h:body>
+
   <h1>Like Hero To Zero</h1>
   <h2>Übersicht über den CO2-Ausstoß der Länder</h2>
 
   <h:form>
-
     <p:toolbar id="stick" style="display: flex; justify-content: space-between; align-items: center; margin: 2px; top: 70px !important;">
       <f:facet name="left">
         <p:commandButton id="button" value="Daten bearbeiten" action="/Wissenschaftleransicht.xhtml?faces-redirect=true" styleClass="ui-button-raised"/>
@@ -25,23 +25,16 @@
       </f:facet>
     </p:toolbar>
     <p:sticky target="stick"/>
-
-
   </h:form>
 
   <h:form>
     <div class="card">
       <p:dataTable var="row" value="#{datenAnzeige.data}" paginator="true" rows="10">
         <p:column field="land" headerText="Land" sortable="false"/>
-        <p:column field="ausstoss" headerText="Ausstoss" filterable="false" sortable="false"/>
+        <p:column field="ausstoss" headerText="GHG Ausstoß (in mtCO2eq/year)" filterable="false" sortable="false"/>
       </p:dataTable>
     </div>
   </h:form>
-
-
-
-
-
 
 </h:body>
 </html>
