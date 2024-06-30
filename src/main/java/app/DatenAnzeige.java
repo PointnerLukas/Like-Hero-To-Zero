@@ -134,8 +134,7 @@ public class DatenAnzeige {
 
     public void onRowEdit(RowEditEvent<Daten> event) {
         Daten editedData = event.getObject();
-        System.out.println("onRowEdit erreicht");
-        System.out.println(data.toString());
+
 
         entityManager.getTransaction().begin();
         try {
@@ -146,12 +145,12 @@ public class DatenAnzeige {
                 entityManager.getTransaction().rollback();
             }
         }
-        FacesMessage msg = new FacesMessage("Land wurde bearbeitet", String.valueOf(event.getObject().getLand()));
+        FacesMessage msg = new FacesMessage("Daten bearbeitet", String.valueOf(event.getObject().getLand()));
         FacesContext.getCurrentInstance().addMessage(null, msg);
     }
 
     public void onRowCancel(RowEditEvent<Daten> event) {
-        FacesMessage msg = new FacesMessage("Edit Cancelled", String.valueOf(event.getObject().getLand()));
+        FacesMessage msg = new FacesMessage("Bearbeiten abgebrochen", String.valueOf(event.getObject().getLand()));
         FacesContext.getCurrentInstance().addMessage(null, msg);
     }
 
@@ -168,7 +167,7 @@ public class DatenAnzeige {
                 entityManager.getTransaction().rollback();
             }
         }
-        FacesMessage msg = new FacesMessage("New Product added", String.valueOf(newData.getLand()));
+        FacesMessage msg = new FacesMessage("Daten hinzugefügt", String.valueOf(newData.getLand()));
         FacesContext.getCurrentInstance().addMessage(null, msg);
     }
 
