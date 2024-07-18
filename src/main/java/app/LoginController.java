@@ -29,7 +29,7 @@ public class LoginController implements Serializable {
 
     String user, password;
     String tempUsername;
-    String failureMessage = "";
+
 
     public String getUser() {
         return user;
@@ -47,17 +47,9 @@ public class LoginController implements Serializable {
         this.password = password;
     }
 
-    public String getFailureMessage() {
-        return failureMessage;
-    }
-
-    public void setFailureMessage(String failureMessage) {
-        this.failureMessage = failureMessage;
-    }
 
     public void checkLogin() {
         if(!currentUser.isValid()) {
-            failureMessage = "Bitte loggen Sie sich ein.";
             FacesContext fc = FacesContext.getCurrentInstance();
             NavigationHandler nh = fc.getApplication().getNavigationHandler();
             nh.handleNavigation(fc, null, "login.xhtml?faces-redirect=true");
@@ -95,10 +87,8 @@ public class LoginController implements Serializable {
         System.out.println("password: " + password);
         System.out.println(currentUser.isAdmin());
         if (currentUser.isAdmin()) {
-            this.failureMessage = "";
             return "Wissenschaftleransicht.xhtml?faces-redirect=true";
         } else {
-            this.failureMessage = "Passwort und Benutzername nicht erkannt.";
             return "";
         }
     }

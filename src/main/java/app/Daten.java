@@ -13,7 +13,6 @@ public class Daten implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-
     private String land;
     private String ausstoss;
 
@@ -22,15 +21,8 @@ public class Daten implements Serializable {
         this.ausstoss = ausstoss;
     }
 
-    public Daten() {}
+    public Daten() {
 
-    @Override
-    public String toString() {
-        return "Daten{" +
-                "id=" + id +
-                ", land='" + land + '\'' +
-                ", ausstoss='" + ausstoss + '\'' +
-                '}';
     }
 
     public Long getId() {
@@ -45,9 +37,6 @@ public class Daten implements Serializable {
         return ausstoss;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public void setLand(String land) {
         this.land = land;

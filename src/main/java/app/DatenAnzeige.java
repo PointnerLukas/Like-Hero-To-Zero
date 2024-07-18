@@ -29,7 +29,7 @@ import java.util.logging.Logger;
 public class DatenAnzeige {
 
     private final String[][] users = new String[][]{
-            // password hash obtained with java LoginController koch i-am-the-boss
+            // Username and password: koch i-am-the-boss
             new String[]{"koch",
                     "+INdDt2JaxoJLHzD4iAlWPYMJA0uJhusP37DvMHBKmen15EMj1Vn7BAxWS1TYFniKFKjuSyIEFbxy9jSx4d8Tw==",
                     "admin"},
@@ -161,7 +161,6 @@ public class DatenAnzeige {
         try {
             entityManager.persist(newData);
             entityManager.getTransaction().commit();
-            data.add(newData);
         } catch (Exception e) {
             if (entityManager.getTransaction().isActive()) {
                 entityManager.getTransaction().rollback();
@@ -177,7 +176,6 @@ public class DatenAnzeige {
             Daten managedDaten = entityManager.find(Daten.class, daten.getId());
             if (managedDaten != null) {
                 entityManager.remove(managedDaten);
-                data.remove(daten);
                 entityManager.getTransaction().commit();
             }
         } catch (Exception e) {

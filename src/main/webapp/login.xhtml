@@ -20,17 +20,21 @@
         <p:inputText id="user" value="#{loginController.user}" size="40" required="true">
             <f:event type="postValidate" listener="#{loginController.postValidateUser}"/>
         </p:inputText>
-            <h:message for="user" styleClass="error"/>
+
+
+
+        <h3><p:outputLabel value="Passwort"/></h3>
+        <p:password id="password" value="#{loginController.password}" toggleMask="true" required="true" validator="#{loginController.validateLogin}"/>
+
+
+        <div style="margin-bottom: 5px; margin-top: 5px">
+            <p:outputLabel value="Bitte melden Sie sich an."/>
+        </div>
 
         <p:spacer/>
-        <h3><p:outputLabel value="Passwort" /></h3>
-        <p:password id="password" value="#{loginController.password}" toggleMask="true" required="true" validator="#{loginController.validateLogin}"/>
-            <h:message for="password" styleClass="error"/>
-
-        <p class="error"><h:outputText value="#{loginController.failureMessage}"/></p>
         <div class="card">
-            <p:commandButton style="margin: 2" id="button-l" action="#{loginController.login}" value="Login" styleClass="ui-button-raised" update="message"/>
-            <p:commandButton style="margin: 2" id="button-r" action="Nutzeransicht.xhtml?faces-redirect=true" value="Abbrechen" immediate="true" styleClass="ui-button-raised ui-button-secondary"/>
+            <p:commandButton style="margin-right: 2px; margin-top: 2px" id="button-l" action="#{loginController.login}" value="Anmelden" styleClass="ui-button-raised" update="message"/>
+            <p:commandButton style="margin: 2px" id="button-r" action="Nutzeransicht.xhtml?faces-redirect=true" value="Abbrechen" immediate="true" styleClass="ui-button-raised ui-button-secondary"/>
         </div>
 
     </h:form>
